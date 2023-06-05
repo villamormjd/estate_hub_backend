@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from src.routes.user import user
+from src.routes.property import prop
 
 #Initiating App Object
 app = FastAPI(
@@ -9,6 +10,7 @@ app = FastAPI(
 )
 
 app.include_router(user)
+app.include_router(prop)
 
 origins = ['https://localhost:3000']
 
