@@ -1,11 +1,6 @@
-import datetime
-
 from fastapi import APIRouter
 from src.models.users import User
-from src.config.db import conn
-from src.schemas.users import userEntity, usersEntity
-from src.utils import check_if_email_does_exist
-from bson import ObjectId
+
 
 from src.api.user import AccountManager
 

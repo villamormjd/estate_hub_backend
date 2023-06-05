@@ -1,5 +1,3 @@
-import re
-
 from src.config.db import conn
 from src.schemas.users import userEntity, usersEntity
 

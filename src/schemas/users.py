@@ -1,6 +1,3 @@
-import datetime
-from mongoengine import Document, StringField, IntField, DateTimeField, EmbeddedDocument
-
 
 def userEntity(item) -> dict:
     return {
