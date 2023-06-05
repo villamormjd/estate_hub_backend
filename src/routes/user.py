@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from src.models.users import User
+from src.models.users import *
 from src.api.user import AccountManager
 
 
@@ -13,14 +13,24 @@ def find_all_users():
 
 
 @user.post('/user', tags=["Account"])
-def sign_up(user: User):
+def signup_user(user: User):
     return acc_mngr.sign_up_user(user)
 
 
 @user.post('/login', tags=["Account"])
-def login(username: str, password: str):
+def login_user(username: str, password: str):
     return acc_mngr.login_user({"username": username,
                                 "password": password})
+
+
+@user.post("/user/{id}/add-details", tags=["Account"])
+def add_user_details(id: str, userProfile: UserProfile):
+    return acc_mngr.create_user_profile(id, userProfile)
+
+
+@user.get("/user/{id}/details", tags=["Account"])
+def get_user_details(id: str):
+    return acc_mngr.get_user_profile(id)
 
 
 @user.put('/activate/{id}', tags=["Account"])

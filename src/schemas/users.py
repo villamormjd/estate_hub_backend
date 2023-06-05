@@ -17,3 +17,14 @@ def userEntity(item) -> dict:
 def usersEntity(entity) -> list:
     return [userEntity(item) for item in entity]
 
+
+def userProfileEntity(item) -> dict:
+    print(item)
+    return {
+        "id": str(item['_id']),
+        "user_id": item["user_id"],
+        "opaque_id": item["opaque_id"],
+        "cell_phone_num": item["cell_phone_num"],
+        "created_at": item["created_date"],
+        "updated_at": item["updated_at"]
+    }

@@ -9,7 +9,6 @@ class User(BaseModel):
     password: str
 
 
-class UserProperty(BaseModel):
+class UserProfile(BaseModel):
     cell_phone_num: str
     opaque_id: str
-    role_id: int

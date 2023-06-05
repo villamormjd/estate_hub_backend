@@ -1,17 +1,19 @@
 import datetime
 
+from src.config.constant import Cons
 from src.config.db import conn
-from src.schemas.users import userEntity, usersEntity
-from src.models.users import User
+from src.schemas.users import *
+from src.models.users import *
+from src.utils import *
 from src.utils import check_if_email_does_exist, result_builder
 from bson import ObjectId
-from src.config.constant import Cons
 
 
 class AccountManager:
     def __init__(self):
         self.conn = conn.estatehub
         self.db = self.conn['users']
+        self.userprofile_db = self.conn['userprofile']
 
     def retrieve_all_user(self):
         try:
@@ -62,6 +64,39 @@ class AccountManager:
                 is_error = True
 
             return result_builder(message, data=results, is_error=is_error)
+
+        except Exception as e:
+            return result_builder(str(e), is_error=True)
+
+    def create_user_profile(self, id: str, userProfile: UserProfile):
+        try:
+            users = usersEntity(self.db.find({"_id": ObjectId(id)}))
+            if len(users) > 0:
+                up = dict(userProfile)
+                up["user_id"] = id
+                up["opaque_id"] = generate_opaque_id()
+                up["created_date"] = datetime.datetime.utcnow()
+                up["updated_at"] = datetime.datetime.utcnow()
+                u = self.userprofile_db.insert_one(up)
+                result = userProfileEntity(self.userprofile_db.find_one({"_id": u.inserted_id}))
+
+                users[0]["user_profile"] = result
+
+                return result_builder("Created", data=users[0])
+
+            return result_builder(Cons.USERNAME_NOT_FOUND, is_error=True)
+
+        except Exception as e:
+            return result_builder(str(e), is_error=True)
+
+    def get_user_profile(self, id: str):
+
+        try:
+            user = userEntity(self.db.find_one({"_id": ObjectId(id)}))
+            up = self.userprofile_db.find_one({"user_id": user["id"]})
+            user["user_profile"] = userProfileEntity(up)
+
+            return result_builder("Retrieved", data=user)
 
         except Exception as e:
             return result_builder(str(e), is_error=True)
