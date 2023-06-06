@@ -1,12 +1,15 @@
 import datetime
 
+from bson import ObjectId
 from src.config.constant import Cons
 from src.config.db import conn
 from src.schemas.users import *
 from src.models.users import *
 from src.utils import *
 from src.utils import check_if_email_does_exist, result_builder
-from bson import ObjectId
+from src.config.auth import Authenticator
+
+
 
 
 class AccountManager:
@@ -14,6 +17,7 @@ class AccountManager:
         self.conn = conn.estatehub
         self.db = self.conn['users']
         self.userprofile_db = self.conn['userprofile']
+        self.auth = Authenticator()
 
     def retrieve_all_user(self):
         try:
@@ -45,27 +49,31 @@ class AccountManager:
 
     def login_user(self, user: dict):
         query = self.db.find({"username": user["username"]})
-        results = usersEntity(query)
-        is_error = False
 
+        results = usersEntity(query)
+        print(user)
+        is_error = False
+        token = ""
         try:
             message = Cons.USER_LOGIN_SUCCESS
 
             if len(results) == 0:
                 message = Cons.USERNAME_NOT_FOUND
                 is_error = True
-
-            if results[0]['password'] != user["password"]:
+            elif results[0]['password'] != user["password"]:
                 message = Cons.PASSWORD_INCORRECT
                 is_error = True
-
-            if not results[0]['is_active']:
+            elif not results[0]['is_active']:
                 message = Cons.ACCOUNT_NOT_ACTIVE
                 is_error = True
+            else:
+                token = self.auth.sign_jwt(user["username"])
 
-            return result_builder(message, data=results, is_error=is_error)
+            print(token)
+            return result_builder(message, data=token, is_error=is_error)
 
         except Exception as e:
+            print(1)
             return result_builder(str(e), is_error=True)
 
     def create_user_profile(self, id: str, userProfile: UserProfile):
