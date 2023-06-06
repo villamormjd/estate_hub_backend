@@ -11,7 +11,6 @@ from src.config.auth import Authenticator
 
 
 
-
 class AccountManager:
     def __init__(self):
         self.conn = conn.estatehub
@@ -49,12 +48,12 @@ class AccountManager:
 
     def login_user(self, user: dict):
         query = self.db.find({"username": user["username"]})
-
+        print(query)
         results = usersEntity(query)
-        print(user)
         is_error = False
         token = ""
         try:
+            
             message = Cons.USER_LOGIN_SUCCESS
 
             if len(results) == 0:
