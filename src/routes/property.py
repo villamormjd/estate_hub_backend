@@ -24,3 +24,8 @@ def retrieve_properties():
 @prop.get("/property/{id}/details", tags=["Properties"])
 def retrieve_property_details(id: str):
     return prop_mngr.get_property_attributes(id)
+
+
+@prop.post("/property/{id}/add-staff", tags=["Properties"])
+def add_property_staff(id: str, email: str):
+    return prop_mngr.add_staff_property(id, email)

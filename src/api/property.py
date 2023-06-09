@@ -1,11 +1,12 @@
 import datetime
 
-from src.config.constant import Cons
+from src.config.constant import Cons, Role
 from src.config.db import conn
-from src.models.property import Property, PropertyAttributes
-from src.schemas.property import *
 from bson import ObjectId
 from src.utils import *
+from src.models.property import Property, PropertyAttributes
+from src.schemas.property import *
+from src.api.user import AccountManager
 
 
 class PropertyManager:
@@ -71,3 +72,11 @@ class PropertyManager:
         if len(prop) > 0:
             return True
         return False
+
+    def add_staff_property(self, id: str, email: str):
+        user = AccountManager().get_user_by_email(email)
+        prop = propertyEntities(self.db.find({"_id": ObjectId(id)}))
+        role = Role.STAFF
+
+        results = {"user": user, "property": prop, "role": role}
+        return result_builder("Added Successfully", data=results)

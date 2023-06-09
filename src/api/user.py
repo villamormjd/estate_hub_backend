@@ -10,7 +10,6 @@ from src.utils import check_if_email_does_exist, result_builder
 from src.config.auth import Authenticator
 
 
-
 class AccountManager:
     def __init__(self):
         self.conn = conn.estatehub
@@ -48,7 +47,6 @@ class AccountManager:
 
     def login_user(self, user: dict):
         query = self.db.find({"username": user["username"]})
-        print(query)
         results = usersEntity(query)
         is_error = False
         token = ""
@@ -68,11 +66,9 @@ class AccountManager:
             else:
                 token = self.auth.sign_jwt(user["username"])
 
-            print(token)
             return result_builder(message, data=token, is_error=is_error)
 
         except Exception as e:
-            print(1)
             return result_builder(str(e), is_error=True)
 
     def create_user_profile(self, id: str, userProfile: UserProfile):
@@ -108,6 +104,20 @@ class AccountManager:
         except Exception as e:
             return result_builder(str(e), is_error=True)
 
+    def get_user_by_email(self, email: str):
+        try:
+            user = self.db.find_one({"email": email})
+            if not user:
+                return result_builder(f"Email '{email}' doesn't exist", is_error=True)
+            user = userEntity(user)
+            up = self.userprofile_db.find_one({"user_id": user["id"]})
+            user["user_profile"] = userProfileEntity(up)
+
+            return user
+
+        except Exception as e:
+            return result_builder(str(e), is_error=True)
+
     def activate_user_account(self, id: str):
         try:
             u = self.db.find_one_and_update({"_id": ObjectId(id)},
@@ -119,6 +129,8 @@ class AccountManager:
 
             user = self.db.find_one({"_id": ObjectId(id)})
             results = userEntity(user)
+            if results["is_active"]:
+                return {"message": "Account already activated"}
             return result_builder(Cons.ACCOUNT_ACTIVATED, is_error=False, data=results)
 
         except Exception as e:
