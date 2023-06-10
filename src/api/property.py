@@ -73,6 +73,14 @@ class PropertyManager:
             return True
         return False
 
+    def get_property_by_id(self, property_id):
+        try:
+            prop = propertyEntities(self.db.find({"_id": ObjectId(property_id)}))[0]
+            return prop
+
+        except Exception as e:
+            return result_builder(str(e), is_error=True)
+
     def add_staff_property(self, id: str, email: str):
         user = AccountManager().get_user_by_email(email)
         prop = propertyEntities(self.db.find({"_id": ObjectId(id)}))
