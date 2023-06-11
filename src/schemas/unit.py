@@ -24,3 +24,17 @@ def unitAttributes(item) -> dict:
         "street": item["street"],
         "lot_size": item["lot_size"],
     }
+
+
+def userUnitRole(item) -> dict:
+    return {
+        "id": str(item['_id']),
+        "user_id": item["user_id"],
+        "unit_id": item["unit_id"],
+        "property_id": item["property_id"],
+        "role_id": item["role_id"],
+    }
+
+
+def userUnitRoles(entity):
+    return [userUnitRole(item) for item in entity]

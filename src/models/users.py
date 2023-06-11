@@ -21,7 +21,12 @@ class UserLogin(BaseModel):
     class Config:
         schema_extra = {
             "example": {
-                "username": "john doe",
+                "username": "user1",
                 "password": "password"
             }
         }
+
+
+class UserResident(BaseModel):
+    email: str
+    is_homeowner: bool

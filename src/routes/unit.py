@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from src.models.unit import Unit, UnitAttributes
 from src.schemas.unit import unitEntity, unitAttributes
+from src.models.users import UserResident
 from src.api.unit import UnitManager
 from src.config.auth import jwtBearer
 
@@ -21,3 +22,8 @@ def retrieve_property_units(property_id: str):
 @unit.get("/property/{prop_id}/units/{unit_id}", tags=["Unit"])
 def retrieve_unit(prop_id: str, unit_id: str):
     return unit_mngr.get_unit_by_id(prop_id, unit_id)
+
+
+@unit.post("/property/{prop_id}/units/{unit_id}/add-resident", tags=["Unit"])
+def retrieve_unit(prop_id: str, unit_id: str, user: UserResident):
+    return unit_mngr.add_user_unit_role(prop_id, unit_id, user)

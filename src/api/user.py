@@ -109,11 +109,12 @@ class AccountManager:
             user = self.db.find_one({"email": email})
             if not user:
                 return result_builder(f"Email '{email}' doesn't exist", is_error=True)
+
             user = userEntity(user)
             up = self.userprofile_db.find_one({"user_id": user["id"]})
             user["user_profile"] = userProfileEntity(up)
 
-            return user
+            return result_builder("User retrieved", data=user)
 
         except Exception as e:
             return result_builder(str(e), is_error=True)

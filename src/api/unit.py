@@ -5,8 +5,10 @@ from src.config.db import conn
 from bson import ObjectId
 from src.utils import *
 from src.models.unit import Unit, UnitAttributes
-from src.schemas.unit import unitEntity, unitAttributes, unitEntities
+from src.models.users import UserResident
+from src.schemas.unit import unitEntity, unitAttributes, unitEntities, userUnitRole, userUnitRoles
 from src.api.property import PropertyManager
+from src.api.user import AccountManager
 
 
 class UnitManager:
@@ -14,6 +16,7 @@ class UnitManager:
         self.conn = conn.estatehub
         self.db = self.conn['unit']
         self.unit_attrs_db = self.conn['unit_attributes']
+        self.user_unit_role_db = self.conn['user_unit_role']
 
     def create_unit_property(self, prop_id: str, unit: Unit, attrs: UnitAttributes):
         try:
@@ -78,6 +81,34 @@ class UnitManager:
             attrs = unitAttributes(attrs)
 
             return attrs
+
+        except Exception as e:
+            return result_builder(str(e), is_error=True)
+
+    def add_user_unit_role(self, property_id: str, unit_id: str, user: UserResident):
+        try:
+            _user = AccountManager().get_user_by_email(user.email)
+            if _user["error"]:
+                return _user
+
+            uurs = userUnitRoles(self.user_unit_role_db.find({"unit_id": unit_id,
+                                                    "user_id": _user["data"]["id"]}))
+
+            if len(uurs) > 0:
+                return result_builder("Resident already exists.", is_error=True)
+
+            uur_obj = dict()
+            uur_obj["unit_id"] = unit_id
+            uur_obj["user_id"] = _user["data"]["id"]
+            uur_obj["property_id"] = property_id
+            if user.is_homeowner:
+                uur_obj["role_id"] = Role.HOMEOWNER.value
+            else:
+                uur_obj["role_id"] = Role.RELATIVE.value
+
+            uur = self.user_unit_role_db.insert_one(uur_obj)
+            results = userUnitRole(self.user_unit_role_db.find_one({"_id": uur.inserted_id}))
+            return result_builder("Created", data=results)
 
         except Exception as e:
             return result_builder(str(e), is_error=True)
