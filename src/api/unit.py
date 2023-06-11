@@ -37,6 +37,27 @@ class UnitManager:
         except Exception as e:
             return result_builder(str(e), is_error=True)
 
+    def get_property_units(self, property_id: str):
+        try:
+            units = self.db.find({"property_id": property_id})
+            results = unitEntities(units)
+
+            return result_builder("Units retrieved", data=results)
+
+        except Exception as e:
+            return result_builder(str(e), is_error=True)
+
+    def get_unit_by_id(self, property_id: str, unit_id: str):
+        try:
+            prop = PropertyManager().get_property_by_id(property_id)
+            unit = unitEntity(self.db.find_one({"property_id": prop["id"], "_id": ObjectId(unit_id)}))
+            unit["attributes"] = self.get_unit_attributes(unit["id"])
+
+            return result_builder("Unit retrieved", data=unit)
+
+        except Exception as e:
+            return result_builder(str(e), is_error=True)
+
     def create_unit_attributes(self, unit_id: str, attrs: UnitAttributes):
         try:
             attrs_obj = dict(attrs)
@@ -47,6 +68,16 @@ class UnitManager:
             attrs = self.unit_attrs_db.insert_one(attrs_obj)
             attrs_results = unitAttributes(self.unit_attrs_db.find_one({"_id": attrs.inserted_id}))
             return attrs_results
+
+        except Exception as e:
+            return result_builder(str(e), is_error=True)
+
+    def get_unit_attributes(self, unit_id: str):
+        try:
+            attrs = self.unit_attrs_db.find_one({"unit_id": unit_id})
+            attrs = unitAttributes(attrs)
+
+            return attrs
 
         except Exception as e:
             return result_builder(str(e), is_error=True)

@@ -5,6 +5,9 @@ def unitEntity(item) -> dict:
         "name": item["name"],
         "opaque_id": item['opaque_id'],
         "property_id": item["property_id"],
+        "is_active": item['is_active'],
+        "created_at": item['created_at'],
+        "updated_at": item['updated_at']
     }
 
 
