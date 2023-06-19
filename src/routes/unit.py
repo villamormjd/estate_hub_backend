@@ -25,5 +25,10 @@ def retrieve_unit(prop_id: str, unit_id: str):
 
 
 @unit.post("/property/{prop_id}/units/{unit_id}/add-resident", tags=["Unit"])
-def retrieve_unit(prop_id: str, unit_id: str, user: UserResident):
+def add_unit_resident(prop_id: str, unit_id: str, user: UserResident):
     return unit_mngr.add_user_unit_role(prop_id, unit_id, user)
+
+
+@unit.get("/property/{prop_id}/units/{unit_id}/add-resident", tags=["Unit"])
+def get_unit_residents(prop_id:str, unit_id: str):
+    return unit_mngr.get_unit_residents(prop_id, unit_id)

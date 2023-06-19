@@ -6,7 +6,6 @@ def userEntity(item) -> dict:
         "last_name": item['last_name'],
         "email": item['email'],
         "username": item['username'],
-        "password": item['password'],
         "is_active": item['is_active'],
         "created_at": item['created_date'],
         "updated_at": item['updated_at'],

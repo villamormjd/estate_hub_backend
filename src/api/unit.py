@@ -112,3 +112,16 @@ class UnitManager:
 
         except Exception as e:
             return result_builder(str(e), is_error=True)
+
+    def get_unit_residents(self, propd_id: str, unit_id: str):
+        try:
+            uurs = userUnitRoles(self.user_unit_role_db.find({"unit_id": unit_id,
+                                                              "property_id": propd_id}))
+
+            for uur in uurs:
+                uur['user'] = AccountManager().get_user_profile(uur['user_id'])['data']
+
+            return result_builder("Retrieved", data=uurs)
+
+        except Exception as e:
+            return result_builder(str(e), is_error=True)
