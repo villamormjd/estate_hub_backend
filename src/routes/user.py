@@ -7,7 +7,8 @@ acc_mngr = AccountManager()
 user = APIRouter()
 
 
-@user.get('/user', dependencies=[Depends(jwtBearer())], tags=["Account"])
+#@user.get('/user', dependencies=[Depends(jwtBearer())], tags=["Account"])
+@user.get('/user', tags=["Account"])
 def find_all_users():
     return acc_mngr.retrieve_all_user()
 
@@ -36,3 +37,8 @@ def get_user_details(id: str):
 @user.put('/activate/{id}', tags=["Account"])
 def activate_user(id: str):
     return acc_mngr.activate_user_account(id)
+
+
+@user.put('/user/{id}/reset-password', dependencies=[Depends(jwtBearer())], tags=["Account"])
+def reset_password(id:str, user: UserResetPassword):
+    return acc_mngr.reset_user_password(id, user)

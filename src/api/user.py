@@ -6,6 +6,7 @@ from src.config.db import conn
 from src.schemas.users import *
 from src.models.users import *
 from src.utils import *
+from src.schemas.unit import *
 from src.utils import check_if_email_does_exist, result_builder
 from src.config.auth import Authenticator
 
@@ -15,6 +16,9 @@ class AccountManager:
         self.conn = conn.estatehub
         self.db = self.conn['users']
         self.userprofile_db = self.conn['userprofile']
+        self.unit_db = self.conn['unit']
+        self.unit_attrs_db = self.conn['unit_attributes']
+        self.user_unit_role_db = self.conn['user_unit_role']
         self.auth = Authenticator()
 
     def retrieve_all_user(self):
@@ -47,7 +51,8 @@ class AccountManager:
 
     def login_user(self, user: dict):
         query = self.db.find({"username": user["username"]})
-        results = usersEntity(query)
+        print(query)
+        results = userLoginEntities(query)
         is_error = False
         token = ""
         try:
@@ -98,7 +103,14 @@ class AccountManager:
             user = userEntity(self.db.find_one({"_id": ObjectId(id)}))
             up = self.userprofile_db.find_one({"user_id": user["id"]})
             user["user_profile"] = userProfileEntity(up)
+            uur = userUnitRoles(self.user_unit_role_db.find({"user_id": user["user_profile"]["user_id"]}))
+            units = []
+            for u in uur:
+                ue = unitEntity(self.unit_db.find_one({"_id": ObjectId(u['unit_id'])}))
+                ue['role'] = u['role_id']
+                units.append(ue)
 
+            user['property_unit'] = units
             return result_builder("Retrieved", data=user)
 
         except Exception as e:
@@ -136,6 +148,11 @@ class AccountManager:
 
         except Exception as e:
             return result_builder(str(e), is_error=True)
+
+    def reset_user_password(self, id: str, user: UserResetPassword):
+
+        if not equal_password(user.password, user.confirm_password):
+            return result_builder("Passwords do not match", is_error=True)
 
     def check_if_user_exist(self, user):
         return check_if_email_does_exist(user)

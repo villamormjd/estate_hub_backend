@@ -30,3 +30,8 @@ class UserLogin(BaseModel):
 class UserResident(BaseModel):
     email: str
     is_homeowner: bool
+
+
+class UserResetPassword(BaseModel):
+    password: str
+    confirm_password: str

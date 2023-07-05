@@ -31,3 +31,10 @@ def result_builder(message: str, data=None, is_error: bool = False):
 def generate_opaque_id():
     x = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
     return f"p-{x[:7]}"
+
+
+def equal_password(password: str, confirm_password: str):
+    if password == confirm_password:
+        return True
+
+    return False

@@ -13,6 +13,18 @@ def userEntity(item) -> dict:
     }
 
 
+def userLogin(item) -> dict:
+    return {
+        "username": item['username'],
+        "password": item['password'],
+        "is_active": item['is_active'],
+    }
+
+
+def userLoginEntities(entity) -> list:
+    return [userLogin(item) for item in entity]
+
+
 def usersEntity(entity) -> list:
     return [userEntity(item) for item in entity]
 
